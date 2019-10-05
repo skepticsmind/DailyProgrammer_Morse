@@ -2,6 +2,85 @@ import java.util.*;
 
 class Main {
 
+    public static String translator(Scanner s){
+        String text = "";
+        String translation = "";
+        System.out.println("Enter some text to be translated to morse code, enter \"quit\" to quit");
+        if (s.hasNext("[A-Za-z]+")) {
+            if (s.hasNext("quit")) {
+                System.out.println("Program Terminating");
+                System.exit(0);
+            }
+            System.out.println("Converting English Alphabet to Morse Code");
+            text = s.nextLine().toUpperCase();
+            for (Character c : text.toCharArray()) {
+                translation += englishMorse.valueOf(c.toString()).toMorse();
+            }
+        }else if(s.hasNext("[.-]+")){
+            System.out.println("Converting Morse Code to English Alphabet");
+            text = s.nextLine();
+            translation = translateMorse(text);
+
+        }else{
+            System.out.println("Invalid Text. Enter some text to be translated");
+            s.nextLine();
+        }
+        return translation;
+    }
+
+    public static String translateMorse(String s){
+    //TODO Fix workaround
+
+        String english = "";
+        char translatedChar;
+        String chunk = "";
+        int remainingLength = s.length();
+
+        while (remainingLength > 0){
+
+            if(remainingLength >= 4){
+                chunk = s.substring(0,3);
+            }else {
+                chunk = s.substring(s.length()-remainingLength);
+            }
+
+            translatedChar = chunkTranslator(chunk);
+            english += translatedChar;
+            String workaround = Character.toString(translatedChar).toUpperCase();
+            remainingLength = remainingLength- englishMorse.valueOf(workaround).toMorse().length();
+        }
+        return english;
+    }
+
+    public static char chunkTranslator(String s){
+        char english = 0;
+        boolean found = false;
+        while(!found) {
+            for (englishMorse m : englishMorse.values()) {
+                if (m.toMorse().equals(s)) {
+                    english = m.toEnglish();
+                    found = true;
+                }
+            }
+            s = s.substring(0,s.length()-1);
+        }
+
+        /*
+        for(char c : s.toCharArray()){
+            test += c;
+            for(englishMorse m : englishMorse.values()){
+                if(m.toMorse().equals(test)){
+                    morse += m.toEnglish();
+                    test = "";
+                }
+            }
+        }\
+
+         */
+
+        return english;
+    }
+
     public static void main(String[] args) {
         //Attempt 1 used a two arrays mapped. Kept it in for remembering my solutions.
         /*
@@ -18,21 +97,11 @@ class Main {
         If the user doesnt cooperate and puts in a non-letter value the program will shut down.
         TODO  Want to make a function that converts morse code to english alphabet. Problem being there will be conflicts for which letter is which without spaces
          */
-        String answer = "";
-        Scanner userInput = new Scanner(System.in);
+        String userInput = "";
+        Scanner inputScanner = new Scanner(System.in);
         while (true) {
-            System.out.println("Enter some text to be translated to morse code");
-            if (!userInput.hasNext("[A-Za-z]+")) {
-                System.out.println("Can only convert letters!");
-                userInput.nextLine();
-                continue;
-            }
-            String text = userInput.nextLine().toUpperCase();
-            for(Character c : text.toCharArray()){
-                answer += englishMorse.valueOf(c.toString()).toMorse();
-            }
-            System.out.println(answer);
-            answer = "";
+            userInput = translator(inputScanner);
+            System.out.println(userInput);
         }
     }
 }
